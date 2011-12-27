@@ -1,7 +1,7 @@
 require 'iron_worker'
 require 'json'
 # require 'test/unit'
-
+ARGV=[]
 module Abt
 
   class MiniTestWithHooks < MiniTest::Unit
@@ -38,8 +38,13 @@ module Abt
     merge_gem 'git'
 
     attr_accessor :git_url, :test_config
-
     def run
+      require File.join(File.dirname(__FILE__), '/gems/minitest/lib/minitest/unit')
+      require File.join(File.dirname(__FILE__), '/gems/test-unit/lib/test/unit/priority')
+      require File.join(File.dirname(__FILE__), '/gems/test-unit/lib/test/unit/testcase')
+      require File.join(File.dirname(__FILE__), '/gems/test-unit/lib/test/unit/assertions')
+      require File.join(File.dirname(__FILE__), '/gems/test-unit/lib/test/unit')
+      require File.join(File.dirname(__FILE__), '/gems/minitest/lib/minitest/autorun')
       # Test::Unit.run = false
       MiniTest::Unit.runner = MiniTestWithHooks.new
       # g = Git.open(user_dir, :log => Logger.new(STDOUT))
