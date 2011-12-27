@@ -5,7 +5,7 @@ require 'iron_worker'
 IronWorker.configure do |config|
   config.token = @config['iron_worker']['token']
   config.project_id = @config['iron_worker']['project_id']
-  config.merge_gem 'minitest', :require=>'minitest/autorun'
+  config.merge_gem 'minitest', :require=>['minitest/unit', 'minitest/autorun']
 end
 require 'minitest/autorun'
 
@@ -15,6 +15,9 @@ require_relative '../lib/abt'
 worker = Abt::TestWorker.new
 worker.git_url = "git://github.com/iron-io/iron_mq_ruby.git"
 worker.test_config = @test_config
-worker.run_local
-#worker.queue
-
+#worker.run_local
+worker.queue
+worker.wait_until_complete
+puts "LOG:"
+puts worker.get_log
+#

@@ -1,6 +1,8 @@
+gem 'minitest'
 require 'iron_worker'
 require 'json'
 # require 'test/unit'
+# bump...
 
 module Abt
 
@@ -36,6 +38,7 @@ module Abt
   class TestWorker < IronWorker::Base
 
     merge_gem 'git'
+    #merge_gem 'minitest', :require=>'minitest/autorun'
 
     attr_accessor :git_url, :test_config
 
@@ -52,9 +55,10 @@ module Abt
 
       $abt_config = self.test_config
 
+      puts "cloning #{git_url}..."
       g = Git.clone(git_url, clone_dir, :path => user_dir)
       Dir.glob(File.join(user_dir, clone_dir, 'test', 'test_*.rb')).each { |f|
-        puts 'requiring ' + f.to_s
+        puts "requiring f"
         require f
       }
     end
