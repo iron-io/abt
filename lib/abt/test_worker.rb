@@ -39,13 +39,15 @@ module Abt
 
     attr_accessor :git_url, :test_config
     def run
-      require File.join(File.dirname(__FILE__), '/gems/minitest/lib/minitest/unit')
-      require File.join(File.dirname(__FILE__), '/gems/test-unit/lib/test/unit/priority')
-      require File.join(File.dirname(__FILE__), '/gems/test-unit/lib/test/unit/testcase')
-      require File.join(File.dirname(__FILE__), '/gems/test-unit/lib/test/unit/assertions')
-      require File.join(File.dirname(__FILE__), '/gems/test-unit/lib/test/unit')
-      require File.join(File.dirname(__FILE__), '/gems/minitest/lib/minitest/autorun')
-      # Test::Unit.run = false
+      if is_remote?
+        require File.join(File.dirname(__FILE__), '/gems/minitest/lib/minitest/unit')
+        require File.join(File.dirname(__FILE__), '/gems/test-unit/lib/test/unit/priority')
+        require File.join(File.dirname(__FILE__), '/gems/test-unit/lib/test/unit/testcase')
+        require File.join(File.dirname(__FILE__), '/gems/test-unit/lib/test/unit/assertions')
+        require File.join(File.dirname(__FILE__), '/gems/test-unit/lib/test/unit')
+        require File.join(File.dirname(__FILE__), '/gems/minitest/lib/minitest/autorun')
+      end
+        # Test::Unit.run = false
       MiniTest::Unit.runner = MiniTestWithHooks.new
       # g = Git.open(user_dir, :log => Logger.new(STDOUT))
       clone_dir = 'cloned'
