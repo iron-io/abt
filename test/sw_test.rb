@@ -6,6 +6,7 @@ IronWorker.configure do |config|
   config.token = @config['iron_worker']['token']
   config.project_id = @config['iron_worker']['project_id']
   config.merge_gem 'minitest', :require=>['minitest/unit', 'minitest/autorun']
+  config.merge_gem 'test-unit', :require=>['test/unit/priority', 'test/unit/testcase', 'test/unit/assertions', 'test/unit']
 end
 require 'minitest/autorun'
 
@@ -20,4 +21,4 @@ worker.queue
 worker.wait_until_complete
 puts "LOG:"
 puts worker.get_log
-#
+
