@@ -64,7 +64,7 @@ module Abt
       $abt_config = self.test_config
 
       puts "cloning #{git_url}..."
-      #g = Git.clone(git_url, clone_dir, :path => user_dir)
+      g = Git.clone(git_url, clone_dir, :path => user_dir)
 
 
       Dir.glob(File.join(user_dir, clone_dir, 'test', 'test_*')).each { |f|
