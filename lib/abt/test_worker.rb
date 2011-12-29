@@ -40,7 +40,13 @@ module Abt
     merge_gem 'git'
     merge_gem 'hipchat-api'
     merge 'test_collector'
-    attr_accessor :git_url, :test_config, :hipchat_api_key, :hipchat_room_name
+    merge_folder 'notifiers'
+    attr_accessor :git_url, :test_config, :notifiers
+
+    def add_notifier(notifier_name,notifier_details={})
+      @notifiers||=[]
+      @notifiers<<{"notifier_name"=>notifier_name,"notifier_details"=>notifier_details}
+    end
 
     def run
       if is_remote?
@@ -72,7 +78,10 @@ module Abt
           require f
       }
 
-      Test::Unit::Notify::Notifier.set_notifier(Test::Unit::Notify::HipchatNotifier.new(hipchat_api_key,hipchat_room_name))
+      notifiers.each do|notifier|
+       puts "NOTIFIER:#{notifier.inspect}"
+       Test::Unit::Notify::Notifier.add_notifier(Kernel.const_get(notifier["notifier_name"]).new(notifier["notifier_details"]))
+      end
       Test::Unit::AutoRunner.run
     end
   # ...

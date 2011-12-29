@@ -22,12 +22,14 @@ module Test
       end
 
       class Notifier
-        def self.set_notifier(sender)
-          @sender=sender
-          puts "Setting sender!#{@sender.inspect}"
-          end
-        def self.get_notifier
-          @sender
+        def self.add_notifier(sender)
+          @senders||=[]
+          @senders<<sender
+          puts "adding sender!#{@senders.inspect}"
+        end
+
+        def self.get_notifiers
+          @senders||[]
         end
 
         def attach_to_mediator(mediator)
@@ -44,27 +46,17 @@ module Test
         def finished(elapsed_time)
 
           message = "Status:%s [%g%%] (%gs)" % [@result.status,
-                                              @result.pass_percentage,
-                                              elapsed_time]
+                                                @result.pass_percentage,
+                                                elapsed_time]
           puts "Message:#{message}:"
           puts "TEST_RESULT:#{@result.inspect}"
-          sender = Notifier.get_notifier
-          sender.send_message(message) if sender
+          senders = Notifier.get_notifiers
+          senders.each do |sender|
+            puts "sender:#{sender.inspect}"
+            puts sender.send_message(message) if sender && sender.respond_to?(:send_message)
+          end
         end
 
-      end
-
-      class HipchatNotifier
-        require 'hipchat-api'
-        def initialize(hipchat_api_key, room_name)
-          @client = HipChat::API.new(hipchat_api_key)
-          @room_name = room_name
-        end
-
-        def send_message(message)
-          puts "sending_message #{message}"
-          puts @client.rooms_message(@room_name, 'IronWorker', message, false).body
-        end
       end
     end
   end
