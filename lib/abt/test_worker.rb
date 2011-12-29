@@ -1,47 +1,46 @@
 require 'iron_worker'
 require 'json'
-# require 'test/unit'
 # bump.....
-
 ARGV=[]
 module Abt
-
-  class MiniTestWithHooks < MiniTest::Unit
-    def before_suites
-    end
-
-    def after_suites
-    end
-
-    def _run_suites(suites, type)
-      puts 'run_suites ' + suites.inspect + ' type=' + type.inspect
-      begin
-        before_suites
-        super_result = super(suites, type)
-        puts 'run_suites super_result=' + super_result.inspect
-      ensure
-        after_suites
-      end
-    end
-
-    def _run_suite(suite, type)
-      puts 'run_suite ' + suite.inspect + ' type=' + type.inspect
-      begin
-        # suite.before_suite
-        super_result = super(suite, type)
-        puts 'run_suite super_result=' + super_result.inspect
-      ensure
-        # suite.after_suite
-      end
-    end
-  end
-
-
+  #
+  #class MiniTestWithHooks < MiniTest::Unit
+  #  def before_suites
+  #  end
+  #
+  #  def after_suites
+  #  end
+  #
+  #  def _run_suites(suites, type)
+  #    puts 'run_suites ' + suites.inspect + ' type=' + type.inspect
+  #    begin
+  #      before_suites
+  #      super(suites, type)
+  #    ensure
+  #      after_suites
+  #    end
+  #  end
+  #
+  #
+  #
+  #  def _run_suite(suite, type)
+  #    puts 'run_suite ' + suite.inspect + ' type=' + type.inspect
+  #    begin
+  #      # suite.before_suite
+  #      super(suite, type)
+  #    ensure
+  #      # suite.after_suite
+  #    end
+  #  end
+  #end
+  #
+  #
   class TestWorker < IronWorker::Base
 
     merge_gem 'git'
-
-    attr_accessor :git_url, :test_config
+    merge_gem 'hipchat-api'
+    merge 'test_collector'
+    attr_accessor :git_url, :test_config, :hipchat_api_key, :hipchat_room_name
 
     def run
       if is_remote?
@@ -52,8 +51,8 @@ module Abt
         require File.join(File.dirname(__FILE__), '/gems/test-unit/lib/test/unit')
         require File.join(File.dirname(__FILE__), '/gems/minitest/lib/minitest/autorun')
       end
-        # Test::Unit.run = false
-      MiniTest::Unit.runner = MiniTestWithHooks.new
+      # Test::Unit.run = false
+      #MiniTest::Unit.runner = MiniTestWithHooks.new
       # g = Git.open(user_dir, :log => Logger.new(STDOUT))
       clone_dir = 'cloned'
       x = File.join(user_dir, clone_dir)
@@ -66,41 +65,46 @@ module Abt
 
       puts "cloning #{git_url}..."
       g = Git.clone(git_url, clone_dir, :path => user_dir)
-      Dir.glob(File.join(user_dir, clone_dir, 'test', 'test_*.rb')).each { |f|
-        puts "requiring f"
-        require f
+
+
+      Dir.glob(File.join(user_dir, clone_dir, 'test', 'test_*')).each { |f|
+        puts "requiring #{f}"
+          require f
       }
+
+      Test::Unit::Notify::Notifier.set_notifier(Test::Unit::Notify::HipchatNotifier.new(hipchat_api_key,hipchat_room_name))
+      Test::Unit::AutoRunner.run
     end
-
-    def suite_results_output(options={})
-      line_break = "\n"
-      if options[:format] == 'html'
-        line_break = "<br/>"
-      end
-      s = "Suite Results:#{line_break}"
-      s << "#{@num_failed} failed out of #{@num_tests} tests.#{line_break}"
-      if @num_failed > 0
-        @failed.each do |f|
-          s << "#{f.test_class}.#{f.test_method} failed: #{f.result.message}#{line_break}"
-        end
-      end
-      s << "Test suite duration: #{duration}ms.#{line_break}"
-      s
-    end
-
-    def duration
-      ((@end_time.to_f - @start_time.to_f) * 1000.0).to_i
-    end
-
-    def time_in_ms(t)
-      (t.to_f * 1000.0).to_i
-    end
-
-    # callbacks
-    def on_complete
-
-    end
-
+  #
+  #  def suite_results_output(options={})
+  #    line_break = "\n"
+  #    if options[:format] == 'html'
+  #      line_break = "<br/>"
+  #    end
+  #    s = "Suite Results:#{line_break}"
+  #    s << "#{@num_failed} failed out of #{@num_tests} tests.#{line_break}"
+  #    if @num_failed > 0
+  #      @failed.each do |f|
+  #        s << "#{f.test_class}.#{f.test_method} failed: #{f.result.message}#{line_break}"
+  #      end
+  #    end
+  #    s << "Test suite duration: #{duration}ms.#{line_break}"
+  #    s
+  #  end
+  #
+  #  def duration
+  #    ((@end_time.to_f - @start_time.to_f) * 1000.0).to_i
+  #  end
+  #
+  #  def time_in_ms(t)
+  #    (t.to_f * 1000.0).to_i
+  #  end
+  #
+  #  # callbacks
+  #  def on_complete
+  #
+  #  end
+  #
   end
 
 end
