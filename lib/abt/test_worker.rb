@@ -17,7 +17,8 @@ module Abt
       puts 'run_suites ' + suites.inspect + ' type=' + type.inspect
       begin
         before_suites
-        super(suites, type)
+        super_result = super(suites, type)
+        puts 'run_suites super_result=' + super_result.inspect
       ensure
         after_suites
       end
@@ -27,7 +28,8 @@ module Abt
       puts 'run_suite ' + suite.inspect + ' type=' + type.inspect
       begin
         # suite.before_suite
-        super(suite, type)
+        super_result = super(suite, type)
+        puts 'run_suite super_result=' + super_result.inspect
       ensure
         # suite.after_suite
       end
