@@ -34,7 +34,7 @@ module Abt
   #  end
   #end
   #
-  #
+  #..
   class TestWorker < IronWorker::Base
 
     merge_gem 'git'
@@ -75,7 +75,7 @@ module Abt
       Test::Unit::Notify::Notifier.set_notifier(Test::Unit::Notify::HipchatNotifier.new(hipchat_api_key,hipchat_room_name))
       Test::Unit::AutoRunner.run
     end
-  #
+  # ...
   #  def suite_results_output(options={})
   #    line_break = "\n"
   #    if options[:format] == 'html'
