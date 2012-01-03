@@ -53,7 +53,13 @@ module Test
           senders = Notifier.get_notifiers
           senders.each do |sender|
             puts "sender:#{sender.inspect}"
-            puts sender.send_message(message) if sender && sender.respond_to?(:send_message)
+            if sender
+              if sender.respond_to?(:send_formatted_message)
+                puts sender.send_formatted_message(@result)
+              elsif sender.respond_to?(:send_message)
+                puts sender.send_message(message)
+              end
+            end
           end
         end
 
