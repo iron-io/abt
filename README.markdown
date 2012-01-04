@@ -19,6 +19,13 @@ Get it running locally first, here's an example:
     worker.test_config = @test_config
     worker.run_local
 
+Add notifier
+
+    worker.add_notifier("HipchatNotifier",{"hipchat_api_key"=>'secret_api_key',"room_name"=>'Room Name',"title"=>"From"})
+and/or
+    worker.add_notifier("WebHookNotifier",{"url"=>'notification_url'})
+you could add as many notifiers as you need
+
 Then try queuing it up.
 
     worker.queue
@@ -31,3 +38,25 @@ Schedule it to run regularly to ensure you're always being covered.
 
     worker.schedule(:start_at=>Time.now, :run_every=>3600)
 
+## Custom notifiers
+All you need:
+
+* Implement in your notificator following methods:
+    def initialize(notifier_details)
+      #here you'll need to setup configuration ie:
+      @url = notifier_details["url"]
+    end
+
+    def send_message(message)
+      # here you need to process simple text message
+      post(message)
+    end
+
+    #if you need you could process more detailed results
+
+    def send_formatted_message(result)
+      # result is an instance of Test::Unit::TestResult
+    end
+* Add your custom notifier into 'notifiers' folder or just merge it
+* Add your notifier to worker
+     worker.add_notifier("YourCustomNotifierClass",{"option_name"=>'option_value'})
