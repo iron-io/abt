@@ -39,24 +39,31 @@ Schedule it to run regularly to ensure you're always being covered.
     worker.schedule(:start_at=>Time.now, :run_every=>3600)
 
 ## Custom notifiers
-All you need:
+
+###All you need:
 
 * Implement in your notificator following methods:
+
+here you'll need to setup configuration ie:
+
     def initialize(notifier_details)
-      #here you'll need to setup configuration ie:
       @url = notifier_details["url"]
     end
 
+here you need to process simple text message
+
     def send_message(message)
-      # here you need to process simple text message
-      post(message)
+      puts message
     end
 
-    #if you need you could process more detailed results
+if you need you could process more detailed results
+result is an instance of Test::Unit::TestResult
 
     def send_formatted_message(result)
-      # result is an instance of Test::Unit::TestResult
+     result.inspect
     end
+
+
 * Add your custom notifier into 'notifiers' folder or just merge it
 * Add your notifier to worker
      worker.add_notifier("YourCustomNotifierClass",{"option_name"=>'option_value'})
