@@ -56,8 +56,7 @@ process simple text message
       puts message
     end
 
-if you need you could process more detailed results
-result is an instance of Test::Unit::TestResult
+if you need you could process more detailed results, 'result' is an instance of Test::Unit::TestResult
 
     def send_formatted_message(result)
      result.inspect
@@ -66,4 +65,4 @@ result is an instance of Test::Unit::TestResult
 
 * Add your custom notifier into 'notifiers' folder or just merge it
 * Add your notifier to worker
-     worker.add_notifier("YourCustomNotifierClass",{"option_name"=>'option_value'})
+    worker.add_notifier("YourCustomNotifierClass",{"option_name"=>'option_value'})
