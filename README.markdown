@@ -42,15 +42,15 @@ Schedule it to run regularly to ensure you're always being covered.
 
 ###All you need:
 
-* Implement in your notificator following methods:
+* Implement in your notifier following methods:
 
-here you'll need to setup configuration ie:
+setup configuration:
 
     def initialize(notifier_details)
       @url = notifier_details["url"]
     end
 
-here you need to process simple text message
+process simple text message
 
     def send_message(message)
       puts message
