@@ -43,9 +43,9 @@ module Abt
     merge_folder 'notifiers'
     attr_accessor :git_url, :test_config, :notifiers
 
-    def add_notifier(notifier_name,notifier_details={})
+    def add_notifier(notifier_name, notifier_details={})
       @notifiers||=[]
-      @notifiers<<{"notifier_name"=>notifier_name,"notifier_details"=>notifier_details}
+      @notifiers<<{"notifier_name"=>notifier_name, "notifier_details"=>notifier_details}
     end
 
     def run
@@ -57,9 +57,9 @@ module Abt
         require File.join(File.dirname(__FILE__), '/gems/test-unit/lib/test/unit')
         require File.join(File.dirname(__FILE__), '/gems/minitest/lib/minitest/autorun')
       end
-      # Test::Unit.run = false
-      #MiniTest::Unit.runner = MiniTestWithHooks.new
-      # g = Git.open(user_dir, :log => Logger.new(STDOUT))
+        # Test::Unit.run = false
+        #MiniTest::Unit.runner = MiniTestWithHooks.new
+        # g = Git.open(user_dir, :log => Logger.new(STDOUT))
       clone_dir = 'cloned'
       x = File.join(user_dir, clone_dir)
       p x
@@ -72,48 +72,51 @@ module Abt
       puts "cloning #{git_url}..."
       g = Git.clone(git_url, clone_dir, :path => user_dir)
 
+      log "Bundling gems"
+      system "cd #{user_dir + clone_dir}; bundle install --deployment"
 
       Dir.glob(File.join(user_dir, clone_dir, 'test', 'test_*')).each { |f|
         puts "requiring #{f}"
-          require f
+        require f
       }
-
-      notifiers.each do|notifier|
-       puts "NOTIFIER:#{notifier.inspect}"
-       Test::Unit::Notify::Notifier.add_notifier(Kernel.const_get(notifier["notifier_name"]).new(notifier["notifier_details"]))
+      if notifiers
+        notifiers.each do |notifier|
+          puts "NOTIFIER:#{notifier.inspect}"
+          Test::Unit::Notify::Notifier.add_notifier(Kernel.const_get(notifier["notifier_name"]).new(notifier["notifier_details"]))
+        end
       end
       Test::Unit::AutoRunner.run
     end
-  # ...
-  #  def suite_results_output(options={})
-  #    line_break = "\n"
-  #    if options[:format] == 'html'
-  #      line_break = "<br/>"
-  #    end
-  #    s = "Suite Results:#{line_break}"
-  #    s << "#{@num_failed} failed out of #{@num_tests} tests.#{line_break}"
-  #    if @num_failed > 0
-  #      @failed.each do |f|
-  #        s << "#{f.test_class}.#{f.test_method} failed: #{f.result.message}#{line_break}"
-  #      end
-  #    end
-  #    s << "Test suite duration: #{duration}ms.#{line_break}"
-  #    s
-  #  end
-  #
-  #  def duration
-  #    ((@end_time.to_f - @start_time.to_f) * 1000.0).to_i
-  #  end
-  #
-  #  def time_in_ms(t)
-  #    (t.to_f * 1000.0).to_i
-  #  end
-  #
-  #  # callbacks
-  #  def on_complete
-  #
-  #  end
-  #
+    # ...
+    #  def suite_results_output(options={})
+    #    line_break = "\n"
+    #    if options[:format] == 'html'
+    #      line_break = "<br/>"
+    #    end
+    #    s = "Suite Results:#{line_break}"
+    #    s << "#{@num_failed} failed out of #{@num_tests} tests.#{line_break}"
+    #    if @num_failed > 0
+    #      @failed.each do |f|
+    #        s << "#{f.test_class}.#{f.test_method} failed: #{f.result.message}#{line_break}"
+    #      end
+    #    end
+    #    s << "Test suite duration: #{duration}ms.#{line_break}"
+    #    s
+    #  end
+    #
+    #  def duration
+    #    ((@end_time.to_f - @start_time.to_f) * 1000.0).to_i
+    #  end
+    #
+    #  def time_in_ms(t)
+    #    (t.to_f * 1000.0).to_i
+    #  end
+    #
+    #  # callbacks
+    #  def on_complete
+    #
+    #  end
+    #
   end
 
 end
