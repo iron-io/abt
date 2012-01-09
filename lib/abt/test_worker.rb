@@ -39,6 +39,7 @@ module Abt
 
     merge_gem 'git'
     merge_gem 'hipchat-api'
+    merge_gem 'bundler'
     merge 'test_collector'
     merge_folder 'notifiers'
     attr_accessor :git_url, :test_config, :notifiers
@@ -71,14 +72,25 @@ module Abt
 
       puts "cloning #{git_url}..."
       g = Git.clone(git_url, clone_dir, :path => user_dir)
-
-      log "Bundling gems"
-      system "cd #{user_dir + clone_dir}; bundle install --deployment"
-
+      old_specs = nil
+      current_gemfile = File.join(File.expand_path(user_dir + clone_dir), 'Gemfile')
+      if File.exist?(current_gemfile)
+        log "Bundling gems"
+        system "cd #{user_dir + clone_dir}; bundle install --deployment"
+        log "Gemfile:#{current_gemfile}"
+        old_specs = Gem.loaded_specs.dup
+        Gem.loaded_specs.clear
+        ENV['BUNDLE_GEMFILE'] = current_gemfile
+        log "Bundling!"
+        require 'bundler/setup'
+        log "List of gems from Gemfile: #{Gem.loaded_specs.inspect}"
+      end
       Dir.glob(File.join(user_dir, clone_dir, 'test', 'test_*')).each { |f|
         puts "requiring #{f}"
         require f
       }
+
+
       if notifiers
         notifiers.each do |notifier|
           puts "NOTIFIER:#{notifier.inspect}"
@@ -86,6 +98,16 @@ module Abt
         end
       end
       Test::Unit::AutoRunner.run
+
+      if old_specs
+        Gem.loaded_specs.clear
+        old_specs.each do |k, v|
+          log "Loading gem:#{k}"
+          Gem.loaded_specs[k]=v
+        end
+        log "Full list of gems: #{Gem.loaded_specs.inspect}"
+      end
+
     end
     # ...
     #  def suite_results_output(options={})
