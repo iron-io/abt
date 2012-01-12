@@ -36,7 +36,8 @@ module Abt
   #
   #..
   class TestWorker < IronWorker::Base
-
+    merge_gem 'minitest', :require=>['minitest/unit', 'minitest/autorun']
+    merge_gem 'test-unit', :require=>['test/unit/priority', 'test/unit/testcase', 'test/unit/assertions', 'test/unit']
     merge_gem 'git'
     merge_gem 'hipchat-api'
     merge_gem 'bundler'
@@ -73,10 +74,12 @@ module Abt
       puts "cloning #{git_url}..."
       g = Git.clone(git_url, clone_dir, :path => user_dir)
       old_specs = nil
-      current_gemfile = File.join(File.expand_path(user_dir + clone_dir), 'Gemfile')
+      current_gemfile = File.join(File.expand_path(user_dir+clone_dir+'/test'), 'Gemfile')
+      log "GEMFILE:#{current_gemfile}"
+      log "DIR:#{File.join(user_dir+clone_dir+'/test')}"
       if File.exist?(current_gemfile)
         log "Bundling gems"
-        system "cd #{user_dir + clone_dir}; bundle install --deployment"
+        system "cd #{File.join(user_dir+clone_dir+'/test')}; bundle install --deployment"
         log "Gemfile:#{current_gemfile}"
         old_specs = Gem.loaded_specs.dup
         Gem.loaded_specs.clear
