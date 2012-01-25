@@ -43,7 +43,7 @@ module Abt
     merge_gem 'bundler'
     merge 'test_collector'
     merge_folder 'notifiers'
-    attr_accessor :git_url, :test_config, :notifiers
+    attr_accessor :git_url, :test_config, :notifiers, :notify_every
 
     def add_notifier(notifier_name, notifier_details={})
       @notifiers||=[]
@@ -93,7 +93,7 @@ module Abt
         require f
       }
 
-
+      Test::Unit::Notify::Notifier.add_params({:notify_every=>notify_every}) if notify_every
       if notifiers
         notifiers.each do |notifier|
           puts "NOTIFIER:#{notifier.inspect}"

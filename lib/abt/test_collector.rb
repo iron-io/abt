@@ -22,6 +22,16 @@ module Test
       end
 
       class Notifier
+
+        def self.add_params(params={})
+          @params||={}
+          @params.merge!(params)
+        end
+
+        def self.get_params
+          @params||{}
+        end
+
         def self.add_notifier(sender)
           @senders||=[]
           @senders<<sender
@@ -43,17 +53,27 @@ module Test
           @result = result
         end
 
-        def finished(elapsed_time)
+        def notify?(params,result)
+          return true unless result.passed?
+          if params && params[:notify_every]
+            ((Time.now.hour % params[:notify_every].to_i == 0) && Time.now.min > 0 && Time.now.min < 10)
+          else
+            true
+          end
+        end
 
+        def finished(elapsed_time)
           message = "Status:%s [%g%%] (%gs)" % [@result.status,
                                                 @result.pass_percentage,
                                                 elapsed_time]
           puts "Message:#{message}:"
           puts "TEST_RESULT:#{@result.inspect}"
+          params = Notifier.get_params
           senders = Notifier.get_notifiers
           senders.each do |sender|
             puts "sender:#{sender.inspect}"
-            if sender
+            puts "Notify?:#{notify?(params,@result).inspect}"
+            if sender && notify?(params,@result)
               if sender.respond_to?(:send_formatted_message)
                 puts sender.send_formatted_message(@result)
               elsif sender.respond_to?(:send_message)
