@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
     "lib/abt/notifiers/hipchat_notifier.rb",
     "lib/abt/notifiers/web_hook_notifier.rb",
     "lib/abt/test_collector.rb",
-    "lib/abt/test_worker.rb"
+    "lib/abt/abt_worker.rb"
   ]
   s.homepage = "https://github.com/iron-io/abt"
   s.require_paths = ["lib"]

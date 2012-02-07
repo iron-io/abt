@@ -35,7 +35,7 @@ module Abt
   #end
   #
   #..
-  class TestWorker < IronWorker::Base
+  class AbtWorker < IronWorker::Base
     merge_gem 'minitest', :require=>['minitest/unit', 'minitest/autorun']
     merge_gem 'test-unit', :require=>['test/unit/priority', 'test/unit/testcase', 'test/unit/assertions', 'test/unit']
     merge_gem 'git'
