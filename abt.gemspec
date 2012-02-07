@@ -13,13 +13,13 @@ Gem::Specification.new do |s|
   s.description = "Always Be Testing Yo! A testing framework that runs on IronWorker http://www.iron.io"
   s.email = "travis@iron.io"
   s.extra_rdoc_files = [
-    "README.markdown"
+    "README.md"
   ]
   s.files = [
     "VERSION.yml",
     "lib/abt.rb",
     "lib/abt/abt_worker.rb",
-    "lib/abt/notifiers/hipchat_notifier.rb",
+    "lib/abt/notifiers/hip_chat_notifier.rb",
     "lib/abt/notifiers/web_hook_notifier.rb",
     "lib/abt/test_collector.rb"
   ]

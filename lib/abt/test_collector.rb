@@ -35,7 +35,7 @@ module Test
         def self.add_notifier(sender)
           @senders||=[]
           @senders<<sender
-          puts "adding sender!#{@senders.inspect}"
+          puts "adding sender! #{@senders.inspect}"
         end
 
         def self.get_notifiers

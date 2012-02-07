@@ -19,12 +19,11 @@ Get it running locally first, here's an example:
     worker.test_config = @test_config
     worker.run_local
 
-Add notifier
+Add built in notifier:
 
-    worker.add_notifier("HipchatNotifier",{"hipchat_api_key"=>'secret_api_key',"room_name"=>'Room Name',"title"=>"From"})
-and/or
-    worker.add_notifier("WebHookNotifier",{"url"=>'notification_url'})
-you could add as many notifiers as you need
+    worker.add_notifier(:hip_chat_notifier, :config=>{"hipchat_api_key"=>'secret_api_key', "room_name"=>'Room Name', "user_name"=>"AbtWorker"})
+
+you can add as many notifiers as you need and even make your own (read down for how to build custom notifiers).
 
 Then try queuing it up.
 
@@ -40,14 +39,14 @@ Schedule it to run regularly to ensure you're always being covered.
 
 ## Custom notifiers
 
-###All you need:
+Here's how to build your own notifiers.
 
-* Implement in your notifier following methods:
+* Implement in your notifier the following methods:
 
 setup configuration:
 
-    def initialize(notifier_details)
-      @url = notifier_details["url"]
+    def initialize(config)
+      @url = config["url"]
     end
 
 process simple text message
@@ -56,13 +55,12 @@ process simple text message
       puts message
     end
 
-if you need you could process more detailed results, 'result' is an instance of Test::Unit::TestResult
+if you want more detailed results, 'result' is an instance of Test::Unit::TestResult
 
     def send_formatted_message(result)
      result.inspect
     end
 
+Then to use it:
 
-* Add your custom notifier into 'notifiers' folder or just merge it
-* Add your notifier to worker
-    worker.add_notifier("YourCustomNotifierClass",{"option_name"=>'option_value'})
+    worker.add_notifier(File.join(File.dirname(__FILE__), 'console_notifier'), :class_name=>'ConsoleNotifier', :config={})

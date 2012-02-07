@@ -11,9 +11,9 @@ Jeweler::Tasks.new do |gemspec|
   gemspec.authors = ["Travis Reeder"]
   gemspec.files = FileList['lib/**/*.rb', 'VERSION.yml']
   gemspec.add_dependency 'git'
+  gemspec.add_dependency 'minitest'
+  gemspec.add_dependency 'test-unit'
   gemspec.add_dependency 'iron_worker'
-  # gemspec.add_dependency 'rest-client'
-  #gemspec.add_dependency 'typhoeus'
   gemspec.required_ruby_version = '>= 1.9'
 end
 Jeweler::GemcutterTasks.new

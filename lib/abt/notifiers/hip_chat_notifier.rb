@@ -1,10 +1,11 @@
-class HipchatNotifier
+class HipChatNotifier
+  IronWorker.config.merge_gem 'hipchat-api'
   require 'hipchat-api'
 
-  def initialize(notifier_details)
-    @client = HipChat::API.new(notifier_details["hipchat_api_key"])
-    @room_name = notifier_details["room_name"]
-    @title= notifier_details["title"]
+  def initialize(config)
+    @client = HipChat::API.new(config["token"])
+    @room_name = config["room_name"]
+    @user_name = config["user_name"] || "AbtWorker"
   end
 
   def send_formatted_message(result)
@@ -21,7 +22,7 @@ class HipchatNotifier
   def send_message(message,color='yellow')
     puts "sending_message #{message}"
     begin
-      puts @client.rooms_message(@room_name, @title, message, false,color).body
+      puts @client.rooms_message(@room_name, @user_name, message, false,color).body
     rescue =>ex
       ex.inspect
     end

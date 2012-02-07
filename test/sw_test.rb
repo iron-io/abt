@@ -13,10 +13,12 @@ require_relative '../lib/abt'
 worker = Abt::AbtWorker.new
 worker.git_url = "git://github.com/iron-io/iron_mq_ruby.git"
 worker.test_config = @test_config
-worker.add_notifier("HipchatNotifier",{"hipchat_api_key"=>'api_key',"room_name"=>'room_name'})
-worker.add_notifier("WebHookNotifier","url"=>"http://www.someurl.com")
+worker.add_notifier(:hip_chat_notifier, :config=>{"token"=>@config["hip_chat"]["token"], "room_name"=>@config["hip_chat"]['room_name']})
+worker.add_notifier(File.join(File.dirname(__FILE__), 'console_notifier'), :class_name=>'ConsoleNotifier')
+#worker.add_notifier("WebHookNotifier", "url"=>"http://www.someurl.com")
 #worker.run_local
 worker.queue
-worker.wait_until_complete
+status = worker.wait_until_complete
+p status
 puts "LOG:"
 puts worker.get_log

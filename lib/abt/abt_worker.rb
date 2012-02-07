@@ -1,53 +1,49 @@
 require 'iron_worker'
 require 'json'
-# bump.....
-ARGV=[]
+
+# bump.
+ARGV=[] # this needs to stay here or else it won't run the correct tests
 module Abt
-  #
-  #class MiniTestWithHooks < MiniTest::Unit
-  #  def before_suites
-  #  end
-  #
-  #  def after_suites
-  #  end
-  #
-  #  def _run_suites(suites, type)
-  #    puts 'run_suites ' + suites.inspect + ' type=' + type.inspect
-  #    begin
-  #      before_suites
-  #      super(suites, type)
-  #    ensure
-  #      after_suites
-  #    end
-  #  end
-  #
-  #
-  #
-  #  def _run_suite(suite, type)
-  #    puts 'run_suite ' + suite.inspect + ' type=' + type.inspect
-  #    begin
-  #      # suite.before_suite
-  #      super(suite, type)
-  #    ensure
-  #      # suite.after_suite
-  #    end
-  #  end
-  #end
-  #
-  #..
+
+  @@notifiers = {}
+  @@notifiers[:hip_chat_notifier] = {:file=>'notifiers/hip_chat_notifier', :class_name=>'HipChatNotifier'}
+
+  def self.notifiers
+    @@notifiers
+  end
+
   class AbtWorker < IronWorker::Base
     merge_gem 'minitest', :require=>['minitest/unit', 'minitest/autorun']
     merge_gem 'test-unit', :require=>['test/unit/priority', 'test/unit/testcase', 'test/unit/assertions', 'test/unit']
     merge_gem 'git'
-    merge_gem 'hipchat-api'
     merge_gem 'bundler'
     merge 'test_collector'
-    merge_folder 'notifiers'
+    #merge_folder 'notifiers'
     attr_accessor :git_url, :test_config, :notifiers, :notify_every
 
-    def add_notifier(notifier_name, notifier_details={})
-      @notifiers||=[]
-      @notifiers<<{"notifier_name"=>notifier_name, "notifier_details"=>notifier_details}
+    def initialize
+      @notifiers = []
+    end
+
+    def add_notifier(notifier_class, notifier_details={})
+      p notifier_class
+      p notifier_details
+      notifier_entry = {}
+      if notifier_class.instance_of?(Symbol)
+        p Abt.notifiers
+        n = Abt.notifiers[notifier_class]
+        puts "n=" + n.inspect
+        raise "Notifier not found: #{notifier_class}" if n.nil?
+        self.class.merge n[:file]
+        notifier_entry["class_name"] = n[:class_name]
+        notifier_entry["config"] = notifier_details[:config]
+      else
+        self.class.merge notifier_class
+        raise "Must include :class option" if notifier_details[:class_name].nil?
+        notifier_entry["class_name"] = notifier_details[:class_name]
+        notifier_entry["config"] = notifier_details[:config]
+      end
+      @notifiers << notifier_entry
     end
 
     def run
@@ -59,9 +55,6 @@ module Abt
         require File.join(File.dirname(__FILE__), '/gems/test-unit/lib/test/unit')
         require File.join(File.dirname(__FILE__), '/gems/minitest/lib/minitest/autorun')
       end
-        # Test::Unit.run = false
-        #MiniTest::Unit.runner = MiniTestWithHooks.new
-        # g = Git.open(user_dir, :log => Logger.new(STDOUT))
       clone_dir = 'cloned'
       x = File.join(user_dir, clone_dir)
       p x
@@ -97,10 +90,12 @@ module Abt
       if notifiers
         notifiers.each do |notifier|
           puts "NOTIFIER:#{notifier.inspect}"
-          Test::Unit::Notify::Notifier.add_notifier(Kernel.const_get(notifier["notifier_name"]).new(notifier["notifier_details"]))
+          Test::Unit::Notify::Notifier.add_notifier(Kernel.const_get(notifier["class_name"]).new(notifier["config"]))
         end
       end
+      puts 'Starting autorunner'
       Test::Unit::AutoRunner.run
+      puts 'Autorunner finished'
 
       if old_specs
         Gem.loaded_specs.clear
@@ -112,36 +107,7 @@ module Abt
       end
 
     end
-    # ...
-    #  def suite_results_output(options={})
-    #    line_break = "\n"
-    #    if options[:format] == 'html'
-    #      line_break = "<br/>"
-    #    end
-    #    s = "Suite Results:#{line_break}"
-    #    s << "#{@num_failed} failed out of #{@num_tests} tests.#{line_break}"
-    #    if @num_failed > 0
-    #      @failed.each do |f|
-    #        s << "#{f.test_class}.#{f.test_method} failed: #{f.result.message}#{line_break}"
-    #      end
-    #    end
-    #    s << "Test suite duration: #{duration}ms.#{line_break}"
-    #    s
-    #  end
-    #
-    #  def duration
-    #    ((@end_time.to_f - @start_time.to_f) * 1000.0).to_i
-    #  end
-    #
-    #  def time_in_ms(t)
-    #    (t.to_f * 1000.0).to_i
-    #  end
-    #
-    #  # callbacks
-    #  def on_complete
-    #
-    #  end
-    #
+
   end
 
 end
