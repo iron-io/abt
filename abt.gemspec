@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Travis Reeder"]
   s.date = %q{2012-02-06}
-  s.description = %q{Always Be Testing Yo! A testing framework that you can schedule and run with IronWorker http://www.iron.io}
+  s.description = %q{Always Be Testing Yo! A testing framework that runs on IronWorker http://www.iron.io}
   s.email = %q{travis@iron.io}
   s.extra_rdoc_files = [
     "README.markdown"
