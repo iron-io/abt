@@ -1,8 +1,8 @@
 # Always Be Testing!!!
 
-A test suite that uses IronWorker by http://www.iron.io to run it. 
+A test framework that uses [IronWorker](http://www.iron.io) to run it... constantly. 
 
-Read this blog post for background: http://blog.iron.io/2012/02/when-unit-tests-arent-enough-abt-always.html
+Read this blog post for background: [When Unit Tests Aren't Enough... ABT - Always Be Testing](http://blog.iron.io/2012/02/when-unit-tests-arent-enough-abt-always.html).
 
 ## Getting Started
 
