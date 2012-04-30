@@ -1,6 +1,8 @@
 # Always Be Testing!!!
 
-A test suite that uses IronWorker by http://www.iron.io to run it.
+A test suite that uses IronWorker by http://www.iron.io to run it. 
+
+Read this blog post for background: http://blog.iron.io/2012/02/when-unit-tests-arent-enough-abt-always.html
 
 ## Getting Started
 
