@@ -23,6 +23,7 @@ A real world example of using $abt_config is here: https://github.com/iron-io/ir
     require 'abt'
     worker = Abt::TestWorker.new
     worker.git_url = "git://github.com/iron-io/iron_mq_ruby.git"
+    # test_config will be exactly what your library will find at $abt_config
     worker.test_config = @test_config
     worker.run_local
 
