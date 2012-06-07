@@ -43,6 +43,7 @@ module Abt
         notifier_entry["class_name"] = notifier_details[:class_name]
         notifier_entry["config"] = notifier_details[:config]
       end
+      notifier_entry["config"].merge!({"git_url"=>@git_url}) if notifier_entry["config"]
       @notifiers << notifier_entry
     end
 

@@ -75,7 +75,7 @@ module Test
             puts "Notify?:#{notify?(params,@result).inspect}"
             if sender && notify?(params,@result)
               if sender.respond_to?(:send_formatted_message)
-                puts sender.send_formatted_message(@result)
+                puts sender.send_formatted_message({:result=>@result,:elapsed_time=>elapsed_time})
               elsif sender.respond_to?(:send_message)
                 puts sender.send_message(message)
               end
