@@ -1,5 +1,5 @@
 class HipChatNotifier
-  IronWorker.config.merge_gem 'hipchat-api'
+  IronWorker.config.merge_gem 'hipchat-api' if defined? IronWorker
   require 'hipchat-api'
 
   def initialize(config)

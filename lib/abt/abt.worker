@@ -1,0 +1,10 @@
+gem 'minitest'
+gem 'test-unit'
+gem 'git'
+gem 'bundler'
+gem 'hipchat-api'
+file 'test_collector.rb'
+dir 'notifiers'
+runtime "ruby"
+exec "abt_worker_ng.rb"
+name 'AbtWorker'
