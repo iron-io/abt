@@ -1,3 +1,4 @@
+gem 'rest-client'
 gem 'minitest'
 gem 'test-unit'
 gem 'git'

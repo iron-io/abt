@@ -1,20 +1,22 @@
-# bump.
+require 'rest_client'
 ARGV=[] # this needs to stay here or else it won't run the correct tests
-require 'git'
-require 'bundler'
-require 'hipchat-api'
+
+
 require 'minitest/unit'
+require 'minitest/autorun'
 require 'test/unit/priority'
 require 'test/unit/testcase'
 require 'test/unit/assertions'
 require 'test/unit'
-require 'minitest/autorun'
-require 'test_collector'
-Dir[File.dirname(__FILE__) + '/notifiers/*.rb'].each {|file| require file }
+require 'git'
+require 'bundler'
+
+
+require File.dirname(__FILE__) + '/test_collector.rb'
+Dir[File.dirname(__FILE__) + '/notifiers/*.rb'].each { |file| require file }
 clone_dir = 'cloned'
 x = File.join('.', clone_dir)
 p x
-
 $abt_config = params['test_config']
 
 puts "cloning #{params['git_url']}..."
