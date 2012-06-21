@@ -27,15 +27,43 @@ A real world example of using $abt_config is here: https://github.com/iron-io/ir
     worker.test_config = @test_config
     worker.run_local
 
+ NG version(iron_worker_ng gem)
+
+ Upload worker from console:
+
+    iron_worker upload abt
+
+ Create worker:
+
+    require 'iron_worker_ng'
+    client = IronWorkerNG::Client.new(:token => 'TOKEN', :project_id => 'PROJECT_ID')
+    params = {
+          "git_url" => 'git://github.com/iron-io/iron_mq_ruby.git',
+          "parameters" => ['--name=/test_performance.*/'],
+          "test_config" => {TESTCONFIG}
+
 ### Add built in notifier (optional):
 
-    worker.add_notifier(:hip_chat_notifier, :config=>{"hipchat_api_key"=>'secret_api_key', "room_name"=>'Room Name', "user_name"=>"AbtWorker"})
+    worker.add_notifier(:hip_chat_notifier, :config=>{"hipchat_api_key"=>'secret_api_key', "room_name"=>'Room Name',"important_room_name"=>'SecondRoom Name', "user_name"=>"AbtWorker"})
+ NG version
+    params.merge! {"notifiers" => [{"class_name"=>"HipChatNotifier",
+                               "config"=>{"token"=>"HIPCHAT_TOKEN",
+                                          "room_name"=>"AlwaysBeTesting",
+                                          "important_room_name"=>"RoomName",
+                                          "user_name"=>"ABT",
+                                          "git_url"=>"git://github.com/SAMPLE.git"}},
+                              ]}
+
 
 you can add as many notifiers as you need and even make your own (read down for how to build custom notifiers).
 
 ### Then try queuing it up.
 
     worker.queue
+
+ NG version
+
+    client.tasks.create('AbtWorker', params)
 
 If that works all good, then:
 
@@ -44,6 +72,10 @@ If that works all good, then:
 Schedule it to run regularly to ensure you're always being covered.
 
     worker.schedule(:start_at=>Time.now, :run_every=>3600)
+
+ NG version
+
+    client.schedules.create('AbtWorker', params, {:start_at => Time.now,:run_every=>600})
 
 ## Custom notifiers
 
@@ -72,3 +104,11 @@ if you want more detailed results, 'result' is an instance of Test::Unit::TestRe
 Then to use it:
 
     worker.add_notifier(File.join(File.dirname(__FILE__), 'console_notifier'), :class_name=>'ConsoleNotifier', :config={})
+
+
+## Custom unit-test command line options(could be used only with NG gem)
+
+filter all test methods by pattern:
+    "parameters" => ['--name=/test_performance.*/']
+
+

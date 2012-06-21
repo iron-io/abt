@@ -1,5 +1,5 @@
 require 'rest_client'
-ARGV=[] # this needs to stay here or else it won't run the correct tests
+ARGV=params['parameters']||[] # this needs to stay here or else it won't run the correct tests
 
 
 require 'minitest/unit'
