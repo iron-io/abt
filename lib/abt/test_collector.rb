@@ -47,10 +47,36 @@ module Test
                                 &method(:started))
           mediator.add_listener(UI::TestRunnerMediator::FINISHED,
                                 &method(:finished))
+          mediator.add_listener(TestCase::STARTED_OBJECT,
+                                 &method(:test_started))
+          mediator.add_listener(TestCase::FINISHED_OBJECT,
+                                 &method(:test_finished))
+          mediator.add_listener(TestSuite::STARTED_OBJECT,
+                                 &method(:test_suite_started))
+          mediator.add_listener(TestSuite::FINISHED_OBJECT,
+                                 &method(:test_suite_finished))
         end
 
         def started(result)
           @result = result
+          @test_benchmarks = {}
+          @suite_benchmarks = {}
+        end
+
+        def test_suite_started(suite_name)
+          @suite_benchmarks[suite_name] = Time.now
+        end
+
+        def test_suite_finished(suite_name)
+          @suite_benchmarks[suite_name] = Time.now - @suite_benchmarks[suite_name]
+        end
+
+        def test_started(name)
+          @test_benchmarks[name] = Time.now
+        end
+
+        def test_finished(name)
+          @test_benchmarks[name] = Time.now - @test_benchmarks[name]
         end
 
         def notify?(params,result)
@@ -67,6 +93,8 @@ module Test
                                                 @result.pass_percentage,
                                                 elapsed_time]
           puts "Message:#{message}:"
+          #puts "BENCHMARKS:#{@test_benchmarks.inspect}"
+          #puts "SUITE BENCHMARKS:#{@suite_benchmarks.inspect}"
           puts "TEST_RESULT:#{@result.inspect}"
           params = Notifier.get_params
           senders = Notifier.get_notifiers
@@ -75,7 +103,10 @@ module Test
             puts "Notify?:#{notify?(params,@result).inspect}"
             if sender && notify?(params,@result)
               if sender.respond_to?(:send_formatted_message)
-                puts sender.send_formatted_message({:result=>@result,:elapsed_time=>elapsed_time})
+                puts sender.send_formatted_message({:result=>@result,
+                                                    :elapsed_time=>elapsed_time,
+                                                    :test_benchmarks=>@test_benchmarks,
+                                                    :suite_benchmarks=>@suite_benchmarks})
               elsif sender.respond_to?(:send_message)
                 puts sender.send_message(message)
               end

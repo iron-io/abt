@@ -1,10 +1,11 @@
 class HipChatNotifier
-  IronWorker.config.merge_gem 'hipchat-api'
+  IronWorker.config.merge_gem 'hipchat-api' if defined? IronWorker
   require 'hipchat-api'
 
   def initialize(config)
     @client = HipChat::API.new(config["token"])
     @room_name = config["room_name"]
+    @important_room_name = config["important_room_name"]
     @user_name = config["user_name"] || "AbtWorker"
     @git_url = config["git_url"]
   end
@@ -14,12 +15,18 @@ class HipChatNotifier
     color = result.passed? ? 'green' : 'red'
     message = "Result: <b>#{result.status}</b> [#{result.pass_percentage}%] (#{params[:elapsed_time]} sec)<br>
      <strong>#{result.run_count}</strong> tests, <strong>#{result.assertion_count}</strong> assertions"
+    message+="<br/><b>Tests benchmarks</b>: <br/>" + format_benchmarks(params[:test_benchmarks]) if params[:test_benchmarks]
     if result.error_occurred? || result.failure_occurred?
       message+=", <strong>#{result.failure_count}</strong> failures, <strong>#{result.error_count}</strong>, errors<br/>"
       result.faults.each { |f| message+="<br><pre>#{add_github_urls(f.to_s.gsub(/>/, ' ').gsub(/</, ' '))}</pre><br/>" }
     end
     message+="<br/>URL: <b>#{@git_url}</b> "
-    send_message(message, color)
+    send_message(@room_name,message, color)
+    send_message(@important_room_name,message, color,true) unless result.passed?
+  end
+
+  def format_benchmarks(test_benchmarks)
+    test_benchmarks.map {|k,v| "#{k} -  #{v.round(2)}sec"}.join('<br/>')
   end
 
   def add_github_urls(message)
@@ -38,12 +45,12 @@ class HipChatNotifier
                   '/\1#L\2'+"'"+'>\0</a>')
   end
 
-  def send_message(message, color='yellow')
+  def send_message(room_name,message, color='yellow',notify=false)
     puts "sending_message #{message}"
     begin
-      puts @client.rooms_message(@room_name, @user_name, message, false,color).body
+      puts @client.rooms_message(room_name, @user_name, message, notify,color).body
     rescue => ex
-      ex.inspect
+      puts ex.inspect
     end
   end
 end
