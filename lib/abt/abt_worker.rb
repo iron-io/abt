@@ -68,7 +68,11 @@ module Abt
       puts "cloning #{git_url}..."
       g = Git.clone(git_url, clone_dir, :path => user_dir)
       old_specs = nil
-      current_gemfile = File.join(File.expand_path(user_dir+clone_dir+'/test'), 'Gemfile')
+
+      test_gemfile = File.join(File.expand_path(user_dir+clone_dir+'/test'), 'Gemfile')
+      root_gemfile = File.join(File.expand_path(user_dir+clone_dir), 'Gemfile')
+      current_gemfile = File.exist?(test_gemfile) ? test_gemfile : root_gemfile
+
       log "GEMFILE:#{current_gemfile}"
       log "DIR:#{File.join(user_dir+clone_dir+'/test')}"
       if File.exist?(current_gemfile)

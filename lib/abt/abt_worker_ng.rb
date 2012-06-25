@@ -22,7 +22,9 @@ $abt_config = params['test_config']
 puts "cloning #{params['git_url']}..."
 Git.clone(params['git_url'], clone_dir, :path => '.')
 old_specs = nil
-current_gemfile = File.join(File.expand_path(clone_dir+'/test'), 'Gemfile')
+test_gemfile = File.join(File.expand_path(clone_dir+'/test'), 'Gemfile')
+root_gemfile = File.join(File.expand_path(clone_dir), 'Gemfile')
+current_gemfile = File.exist?(test_gemfile) ? test_gemfile : root_gemfile
 puts "GEMFILE:#{current_gemfile}"
 puts "DIR:#{File.join(clone_dir+'/test')}"
 puts "#{Dir.glob('*').inspect}"
