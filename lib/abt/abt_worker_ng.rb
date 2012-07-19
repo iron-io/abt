@@ -47,6 +47,7 @@ Dir.glob(File.join('.', clone_dir, 'test', 'test_*')).each { |f|
 Test::Unit::Notify::Notifier.add_params({:notify_every => params['notify_every']}) if params['notify_every']
 if params['notifiers']
   params['notifiers'].each do |notifier|
+    notifier["config"].merge!({"task_id"=>iron_task_id,"git_url"=>params['git_url']}) if notifier["config"]
     puts "NOTIFIER:#{notifier.inspect}"
     Test::Unit::Notify::Notifier.add_notifier(Kernel.const_get(notifier["class_name"]).new(notifier["config"]))
   end

@@ -1,11 +1,10 @@
-gem 'rest-client'
-gem 'minitest'
-gem 'test-unit'
-gem 'git'
-gem 'bundler'
-gem 'hipchat-api'
+merge_gem 'rest-client'
+merge_gem 'minitest'
+merge_gem 'test-unit'
+merge_gem 'git'
+merge_gem 'bundler'
+merge_gem 'hipchat-api'
 file 'test_collector.rb'
 dir 'notifiers'
-runtime "ruby"
 exec "abt_worker_ng.rb"
 name 'AbtWorker'

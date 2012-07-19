@@ -8,6 +8,7 @@ class HipChatNotifier
     @important_room_name = config["important_room_name"]
     @user_name = config["user_name"] || "AbtWorker"
     @git_url = config["git_url"]
+    @iw_details ={:task_id=>config["task_id"],:project_id=>config["project_id"]} if config["task_id"] && config["project_id"]
   end
 
   def send_formatted_message(params)
@@ -21,8 +22,14 @@ class HipChatNotifier
       result.faults.each { |f| message+="<br><pre>#{add_github_urls(f.to_s.gsub(/>/, ' ').gsub(/</, ' '))}</pre><br/>" }
     end
     message+="<br/>URL: <b>#{@git_url}</b> "
+    message+="<br/>HUD: <a href='#{hud_url(@iw_details)}'>#{@iw_details[:task_id]}</a> " if @iw_details
     send_message(@room_name,message, color)
     send_message(@important_room_name,message, color,true) unless result.passed?
+  end
+
+
+  def hud_url(details)
+    "http://hud.iron.io/tq/projects/#{details[:project_id]}/jobs/#{details[:task_id]}"
   end
 
   def format_benchmarks(test_benchmarks)
