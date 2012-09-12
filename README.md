@@ -45,7 +45,9 @@ A real world example of using $abt_config is here: https://github.com/iron-io/ir
 ### Add built in notifier (optional):
 
     worker.add_notifier(:hip_chat_notifier, :config=>{"hipchat_api_key"=>'secret_api_key', "room_name"=>'Room Name',"important_room_name"=>'SecondRoom Name', "user_name"=>"AbtWorker"})
- NG version
+
+NG version
+
     params.merge! {"notifiers" => [{"class_name"=>"HipChatNotifier",
                                "config"=>{"token"=>"HIPCHAT_TOKEN",
                                           "room_name"=>"AlwaysBeTesting",
