@@ -20,14 +20,6 @@ A real world example of using $abt_config is here: https://github.com/iron-io/ir
 
 ### Get it running locally first, here's an example:
 
-    require 'abt'
-    worker = Abt::AbtWorker.new
-    worker.git_url = "git://github.com/iron-io/iron_mq_ruby.git"
-    # test_config will be exactly what your library will find at $abt_config
-    worker.test_config = @test_config
-    worker.run_local
-
- NG version(iron_worker_ng gem)
 
  Upload worker from console:
 
@@ -44,10 +36,6 @@ A real world example of using $abt_config is here: https://github.com/iron-io/ir
 
 ### Add built in notifier (optional):
 
-    worker.add_notifier(:hip_chat_notifier, :config=>{"hipchat_api_key"=>'secret_api_key', "room_name"=>'Room Name',"important_room_name"=>'SecondRoom Name', "user_name"=>"AbtWorker"})
-
-NG version
-
     params.merge! {"notifiers" => [{"class_name"=>"HipChatNotifier",
                                "config"=>{"token"=>"HIPCHAT_TOKEN",
                                           "room_name"=>"AlwaysBeTesting",
@@ -61,10 +49,6 @@ you can add as many notifiers as you need and even make your own (read down for 
 
 ### Then try queuing it up.
 
-    worker.queue
-
- NG version
-
     client.tasks.create('AbtWorker', params)
 
 If that works all good, then:
@@ -72,10 +56,6 @@ If that works all good, then:
 ## Schedule It!
 
 Schedule it to run regularly to ensure you're always being covered.
-
-    worker.schedule(:start_at=>Time.now, :run_every=>3600)
-
- NG version
 
     client.schedules.create('AbtWorker', params, {:start_at => Time.now,:run_every=>600})
 
@@ -108,9 +88,41 @@ Then to use it:
     worker.add_notifier(File.join(File.dirname(__FILE__), 'console_notifier'), :class_name=>'ConsoleNotifier', :config={})
 
 
-## Custom unit-test command line options(could be used only with NG gem)
+## Custom unit-test command line options
 
 filter all test methods by pattern:
     "parameters" => ['--name=/test_performance.*/']
 
+## Webhooks
+* Setup parameters in config.yml (in lib/abt dir)
+* Upload abt worker
+* Configure Github (or any other) webhook ie: https://worker-aws-us-east-1.iron.io/2/projects/{PROJECT_ID}/tasks/webhook?oauth={TOKEN}&code_name=AbtWorker
 
+
+
+###Obsolete iron_worker version
+
+### Get it running locally first, here's an example:
+
+    require 'abt'
+    worker = Abt::AbtWorker.new
+    worker.git_url = "git://github.com/iron-io/iron_mq_ruby.git"
+    # test_config will be exactly what your library will find at $abt_config
+    worker.test_config = @test_config
+    worker.run_local
+
+### Add built in notifier (optional):
+
+    worker.add_notifier(:hip_chat_notifier, :config=>{"hipchat_api_key"=>'secret_api_key', "room_name"=>'Room Name',"important_room_name"=>'SecondRoom Name', "user_name"=>"AbtWorker"})
+
+### Then try queuing it up.
+
+    worker.queue
+
+If that works all good, then:
+
+## Schedule It!
+
+Schedule it to run regularly to ensure you're always being covered.
+
+    worker.schedule(:start_at=>Time.now, :run_every=>3600)
