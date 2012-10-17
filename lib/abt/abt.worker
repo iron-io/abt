@@ -5,6 +5,8 @@ merge_gem 'git'
 merge_gem 'bundler'
 merge_gem 'hipchat-api'
 file 'test_collector.rb'
+file 'test_helper.rb'
+file 'config.yml'
 dir 'notifiers'
 exec "abt_worker_ng.rb"
 name 'AbtWorker'

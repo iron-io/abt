@@ -1,4 +1,7 @@
 require 'rest_client'
+require 'json'
+require 'cgi'
+require 'yaml'
 ARGV=params['parameters']||[] # this needs to stay here or else it won't run the correct tests
 
 
@@ -11,19 +14,36 @@ require 'test/unit'
 require 'git'
 require 'bundler'
 
-
+puts "Params:#{params.inspect}"
+puts "Payload:#{payload.inspect}"
 require File.dirname(__FILE__) + '/test_collector.rb'
+require File.dirname(__FILE__) + '/test_helper.rb'
 Dir[File.dirname(__FILE__) + '/notifiers/*.rb'].each { |file| require file }
 clone_dir = 'cloned'
-x = File.join('.', clone_dir)
+x         = File.join('.', clone_dir)
 p x
 $abt_config = params['test_config']
 
-puts "cloning #{params['git_url']}..."
-Git.clone(params['git_url'], clone_dir, :path => '.')
-old_specs = nil
-test_gemfile = File.join(File.expand_path(clone_dir+'/test'), 'Gemfile')
-root_gemfile = File.join(File.expand_path(clone_dir), 'Gemfile')
+config = {}
+config = YAML.load_file('config.yml') if File.exist? 'config.yml'
+puts "Config from file:#{config.inspect}"
+if payload
+  puts "Got payload from webhook!"
+  cgi_parsed = CGI::parse(payload)
+  puts "cgi_parsed: #{cgi_parsed.inspect}"
+# Then we can parse the json
+  parsed = JSON.parse(cgi_parsed['payload'][0])
+  puts "parsed: #{parsed.inspect}"
+  config['git_url'] = parsed["repository"]["url"] if parsed["repository"] && parsed["repository"]["url"]
+end
+config.merge! params
+puts "Merged config:#{config.inspect}"
+
+puts "cloning #{config['git_url']}..."
+Git.clone(config['git_url'], clone_dir, :path => '.')
+old_specs       = nil
+test_gemfile    = File.join(File.expand_path(clone_dir+'/test'), 'Gemfile')
+root_gemfile    = File.join(File.expand_path(clone_dir), 'Gemfile')
 current_gemfile = File.exist?(test_gemfile) ? test_gemfile : root_gemfile
 puts "GEMFILE:#{current_gemfile}"
 puts "DIR:#{File.join(clone_dir+'/test')}"
@@ -44,12 +64,12 @@ Dir.glob(File.join('.', clone_dir, 'test', 'test_*')).each { |f|
   require f
 }
 
-Test::Unit::Notify::Notifier.add_params({:notify_every => params['notify_every']}) if params['notify_every']
-if params['notifiers']
-  params['notifiers'].each do |notifier|
-    notifier["config"].merge!({"task_id"=>iron_task_id,"git_url"=>params['git_url']}) if notifier["config"]
+Test::Unit::Notify::Notifier.add_params({ :notify_every => params['notify_every'] }) if config['notify_every']
+if config['notifiers']
+  config['notifiers'].each do |notifier|
     puts "NOTIFIER:#{notifier.inspect}"
-    Test::Unit::Notify::Notifier.add_notifier(Kernel.const_get(notifier["class_name"]).new(notifier["config"]))
+    notifier["config"].merge!({ "task_id" => iron_task_id, "git_url" => config['git_url'] }) if notifier["config"]
+    Test::Unit::Notify::Notifier.add_notifier(Kernel.const_get(notifier["class_name"]).new(notifier["config"] || {}))
   end
 end
 puts 'Starting autorunner'
