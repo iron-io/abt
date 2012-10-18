@@ -22,8 +22,6 @@ Dir[File.dirname(__FILE__) + '/notifiers/*.rb'].each { |file| require file }
 clone_dir = 'cloned'
 x         = File.join('.', clone_dir)
 p x
-$abt_config = params['test_config']
-
 config = {}
 config = YAML.load_file('config.yml') if File.exist? 'config.yml'
 puts "Config from file:#{config.inspect}"
@@ -37,6 +35,9 @@ if payload
   config['git_url'] = parsed["repository"]["url"] if parsed["repository"] && parsed["repository"]["url"]
 end
 config.merge! params
+
+$abt_config = config['test_config']
+
 puts "Merged config:#{config.inspect}"
 
 puts "cloning #{config['git_url']}..."
