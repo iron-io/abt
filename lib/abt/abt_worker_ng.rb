@@ -22,24 +22,25 @@ Dir[File.dirname(__FILE__) + '/notifiers/*.rb'].each { |file| require file }
 clone_dir = 'cloned'
 x         = File.join('.', clone_dir)
 p x
-config = {}
-config = YAML.load_file('config.yml') if File.exist? 'config.yml'
+$abt_config = params['test_config']
+
+yaml_config = YAML.load_file('config.yml') if File.exist? 'config.yml'
+config = yaml_config|| { }
 puts "Config from file:#{config.inspect}"
 if payload
   puts "Got payload from webhook!"
   cgi_parsed = CGI::parse(payload)
   puts "cgi_parsed: #{cgi_parsed.inspect}"
 # Then we can parse the json
-  parsed = JSON.parse(cgi_parsed['payload'][0])
-  puts "parsed: #{parsed.inspect}"
-  config['git_url'] = parsed["repository"]["url"] if parsed["repository"] && parsed["repository"]["url"]
+  if cgi_parsed['payload'] && cgi_parsed['payload'][0]
+    parsed = JSON.parse(cgi_parsed['payload'][0])
+    puts "parsed: #{parsed.inspect}"
+    config['git_url'] = parsed["repository"]["url"] if parsed["repository"] && parsed["repository"]["url"]
+  end
 end
 config.merge! params
-
-$abt_config = config['test_config']
-
 puts "Merged config:#{config.inspect}"
-
+raise "No git url found!" unless config['git_url']
 puts "cloning #{config['git_url']}..."
 Git.clone(config['git_url'], clone_dir, :path => '.')
 old_specs       = nil
@@ -70,7 +71,7 @@ if config['notifiers']
   config['notifiers'].each do |notifier|
     puts "NOTIFIER:#{notifier.inspect}"
     notifier["config"].merge!({ "task_id" => iron_task_id, "git_url" => config['git_url'] }) if notifier["config"]
-    Test::Unit::Notify::Notifier.add_notifier(Kernel.const_get(notifier["class_name"]).new(notifier["config"] || {}))
+    Test::Unit::Notify::Notifier.add_notifier(Kernel.const_get(notifier["class_name"]).new(notifier["config"] || { }))
   end
 end
 puts 'Starting autorunner'
