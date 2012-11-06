@@ -7,8 +7,11 @@ merge_gem 'hipchat-api'
 #config file
 file 'config.yml'
 #merging notifiers
-dir 'notifiers'
+file 'notifiers/console_notifier.rb','notifiers'
+file 'notifiers/hip_chat_notifier.rb','notifiers'
+file 'notifiers/web_hook_notifier.rb','notifiers'
 #merging helpers
-dir 'lib'
+file 'lib/test_collector.rb','lib'
+file 'lib/test_helper.rb','lib'
 exec "abt_worker.rb"
 name 'AbtWorker'
