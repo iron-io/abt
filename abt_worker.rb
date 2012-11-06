@@ -2,6 +2,7 @@ require 'rest_client'
 require 'json'
 require 'cgi'
 require 'yaml'
+
 ARGV=params['parameters']||[] # this needs to stay here or else it won't run the correct tests
 
 
@@ -13,12 +14,12 @@ require 'test/unit/assertions'
 require 'test/unit'
 require 'git'
 require 'bundler'
+require 'lib/test_collector'
+require 'lib/test_helper'
+Dir[File.dirname(__FILE__) + '/notifiers/*.rb'].each { |file| require file }
 
 puts "Params:#{params.inspect}"
 puts "Payload:#{payload.inspect}"
-require File.dirname(__FILE__) + '/test_collector.rb'
-require File.dirname(__FILE__) + '/test_helper.rb'
-Dir[File.dirname(__FILE__) + '/notifiers/*.rb'].each { |file| require file }
 clone_dir = 'cloned'
 x         = File.join('.', clone_dir)
 p x

@@ -14,18 +14,17 @@ First of all, the code to test must be able to check for a special config variab
 
 A real world example of using $abt_config is here: https://github.com/iron-io/iron_mq_ruby/blob/master/test/test_base.rb
 
-### Install Gem
+### Clone repo
 
-    sudo gem install abt
+    git clone https://github.com/iron-io/abt.git
 
 ### Get it running locally first, here's an example:
-
 
  Upload worker from console:
 
     iron_worker upload abt
 
- Create worker:
+ Create worker(check queue.rb):
 
     require 'iron_worker_ng'
     client = IronWorkerNG::Client.new(:token => 'TOKEN', :project_id => 'PROJECT_ID')
@@ -97,32 +96,3 @@ filter all test methods by pattern:
 * Setup parameters in config.yml (in lib/abt dir)
 * Upload abt worker
 * Configure Github (or any other) webhook ie: https://worker-aws-us-east-1.iron.io/2/projects/{PROJECT_ID}/tasks/webhook?oauth={TOKEN}&code_name=AbtWorker
-
-
-
-##Obsolete iron_worker version
-
-### Get it running locally first, here's an example:
-
-    require 'abt'
-    worker = Abt::AbtWorker.new
-    worker.git_url = "git://github.com/iron-io/iron_mq_ruby.git"
-    # test_config will be exactly what your library will find at $abt_config
-    worker.test_config = @test_config
-    worker.run_local
-
-### Add built in notifier (optional):
-
-    worker.add_notifier(:hip_chat_notifier, :config=>{"hipchat_api_key"=>'secret_api_key', "room_name"=>'Room Name',"important_room_name"=>'SecondRoom Name', "user_name"=>"AbtWorker"})
-
-### Then try queuing it up.
-
-    worker.queue
-
-If that works all good, then:
-
-## Schedule It!
-
-Schedule it to run regularly to ensure you're always being covered.
-
-    worker.schedule(:start_at=>Time.now, :run_every=>3600)
