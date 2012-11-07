@@ -12,4 +12,5 @@ params = {"notifiers" => [{"class_name"=>"HipChatNotifier",
                             {"project_id"=>"YOUR_PROJECT_ID",
                              "token"=>"YOUR_TOKEN"}}}
 
-client.tasks.create('AbtWorker', params)
+client.tasks.create('abt', params)
+

@@ -1,9 +1,12 @@
-merge_gem 'rest-client'
-merge_gem 'minitest'
-merge_gem 'test-unit'
-merge_gem 'git'
-merge_gem 'bundler'
-merge_gem 'hipchat-api'
+runtime 'ruby'
+
+gem 'rest-client'
+gem 'minitest'
+gem 'test-unit'
+gem 'git'
+gem 'bundler'
+gem 'hipchat-api'
+
 #config file
 file 'config.yml'
 #merging notifiers
@@ -13,5 +16,5 @@ file 'notifiers/web_hook_notifier.rb','notifiers'
 #merging helpers
 file 'lib/test_collector.rb','lib'
 file 'lib/test_helper.rb','lib'
+
 exec "abt_worker.rb"
-name 'AbtWorker'
