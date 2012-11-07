@@ -11,16 +11,20 @@ First of all, the code to test must be able to check for a special config variab
     if defined? $abt_config
       @config = $abt_config
     end
+
 A real world example of using $abt_config is here: https://github.com/iron-io/iron_mq_ruby/blob/master/test/test_base.rb
 
 ### Upload worker
 
     iron_worker upload https://github.com/iron-io/abt/blob/master/abt.worker
-   Or (if you want to customize smth)
+
+Or (if you want to customize smth)
 
     git clone https://github.com/iron-io/abt.git
     iron_worker upload abt
+
 ### Get it running
+
   Using CLI
 
     iron_worker queue abt -p "{\"git_url\":\"git://github.com/iron-io/iron_mq_ruby.git\",\"test_config\":{}}"

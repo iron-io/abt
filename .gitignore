@@ -1,3 +1,5 @@
 .idea/
 *.sublime*
 pkg/
+iron.json
+enqueue_private.rb
