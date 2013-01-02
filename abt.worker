@@ -1,4 +1,5 @@
 runtime 'ruby'
+name 'AbtWorker'
 
 gem 'rest-client'
 gem 'minitest'
