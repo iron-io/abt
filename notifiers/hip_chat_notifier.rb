@@ -2,6 +2,8 @@ class HipChatNotifier
   IronWorker.config.merge_gem 'hipchat-api' if defined? IronWorker
   require 'hipchat-api'
 
+  MAX_HIPCHAT_MSG_LENGTH = 10000
+
   def initialize(config)
     @client = HipChat::API.new(config["token"])
     @room_name = config["room_name"]
@@ -15,20 +17,25 @@ class HipChatNotifier
     result = params[:result]
     color = result.passed? ? 'green' : 'red'
     message = "Result: <b>#{result.status}</b> [#{result.pass_percentage}%] (#{params[:elapsed_time]} sec)<br>
-     <strong>#{result.run_count}</strong> tests, <strong>#{result.assertion_count}</strong> assertions"
+     <strong>#{result.run_count}</strong> tests, <strong>#{result.assertion_count}</strong> assertions, <strong>#{result.faults.size}</strong> faults"
+    important_room_failure_message = message
     message+="<br/><b>Tests benchmarks</b>: <br/>" + format_benchmarks(params[:test_benchmarks]) if params[:test_benchmarks]
+    
     if result.error_occurred? || result.failure_occurred?
       message+=", <strong>#{result.failure_count}</strong> failures, <strong>#{result.error_count}</strong>, errors<br/>"
       result.faults.each { |f| message+="<br><pre>#{add_github_urls(f.to_s.gsub(/>/, ' ').gsub(/</, ' '))}</pre><br/>" }
     end
-    message+="<br/>URL: <b>#{@git_url}</b> "
-    message+="<br/>HUD (log): <a href='#{hud_log_url(@iw_details)}'>#{@iw_details[:task_id]}</a> " if @iw_details
+    git_url = "<br/>URL: <b>#{@git_url}</b> "
+    message += git_url
+    important_room_failure_message += git_url
 
-    important_room_failure_message = "Result: <b>#{result.status}</b> [#{result.pass_percentage}%] (#{params[:elapsed_time]} sec)<br>
-     <strong>#{result.run_count}</strong> tests, <strong>#{result.assertion_count}</strong> assertions"
-    important_room_failure_message += "<br/>URL: <b>#{@git_url}</b> "
-    important_room_failure_message += "<br/>HUD (log): <a href='#{hud_log_url(@iw_details)}'>#{@iw_details[:task_id]}</a> " if @iw_details    
+    hud_url = "<br/>HUD (log): <a href='#{hud_log_url(@iw_details)}'>#{@iw_details[:task_id]}</a> " if @iw_details
+    message += hud_url
+    important_room_failure_message += hud_url
 
+    if message.size() > MAX_HIPCHAT_MSG_LENGTH
+      message = important_room_failure_message
+    end
     send_message(@room_name, message, color)
     send_message(@important_room_name, important_room_failure_message, color,true) unless result.passed?
   end
