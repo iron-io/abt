@@ -43,7 +43,9 @@ config.merge! params
 puts "Merged config:#{config.inspect}"
 raise "No git url found!" unless config['git_url']
 puts "cloning #{config['git_url']}..."
-Git.clone(config['git_url'], clone_dir, :path => '.')
+g = Git.clone(config['git_url'], clone_dir, :path => '.')
+branch = config.fetch('git_branch', 'master')
+g.checkout(branch)
 old_specs       = nil
 test_gemfile    = File.join(File.expand_path(clone_dir+'/test'), 'Gemfile')
 root_gemfile    = File.join(File.expand_path(clone_dir), 'Gemfile')
